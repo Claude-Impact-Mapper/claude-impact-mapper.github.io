@@ -1,8 +1,11 @@
+export type MoscowPriority = 'must' | 'should' | 'could' | 'wont' | 'unknown';
+
 export interface Deliverable {
   id: string;
   text: string;
   notes: string;
   status: 'planned' | 'in-progress' | 'done';
+  moscow: MoscowPriority;
 }
 
 export interface Impact {
@@ -52,5 +55,6 @@ export interface TreeNodeData {
   level: NodeLevel;
   collapsed?: boolean;
   status?: string;
+  moscow?: MoscowPriority;
   parentId?: string;
 }

@@ -1,4 +1,4 @@
-import type { ImpactMap, TreeNodeData, NodeLevel } from '../types';
+import type { ImpactMap, TreeNodeData, NodeLevel, MoscowPriority } from '../types';
 
 export interface TreeNodeWithChildren extends TreeNodeData {
   children?: TreeNodeWithChildren[];
@@ -39,6 +39,7 @@ export function mapToHierarchy(map: ImpactMap): TreeNodeWithChildren {
                       notes: del.notes,
                       level: 'deliverable' as NodeLevel,
                       status: del.status,
+                      moscow: del.moscow || 'unknown',
                       parentId: impact.id,
                     })),
               })),
@@ -64,4 +65,20 @@ export const CHILD_LEVEL: Partial<Record<NodeLevel, NodeLevel>> = {
   goal: 'actor',
   actor: 'impact',
   impact: 'deliverable',
+};
+
+export const MOSCOW_LABELS: Record<MoscowPriority, string> = {
+  must: 'Must',
+  should: 'Should',
+  could: 'Could',
+  wont: "Won't",
+  unknown: 'Unknown',
+};
+
+export const MOSCOW_COLORS: Record<MoscowPriority, string> = {
+  must: '#ef4444',
+  should: '#f97316',
+  could: '#3b82f6',
+  wont: '#6b7280',
+  unknown: '#4b5563',
 };

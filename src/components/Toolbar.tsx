@@ -1,3 +1,6 @@
+import type { MoscowPriority } from '../types';
+import { MOSCOW_LABELS, MOSCOW_COLORS } from '../utils/treeUtils';
+
 interface ToolbarProps {
   fileName: string | null;
   isSynced: boolean;
@@ -9,6 +12,8 @@ interface ToolbarProps {
   onCollapseAll: () => void;
   onShowHistory: () => void;
   hasFileHandle: boolean;
+  moscowFilter: MoscowPriority | 'all';
+  onMoscowFilterChange: (filter: MoscowPriority | 'all') => void;
 }
 
 export default function Toolbar({
@@ -22,6 +27,8 @@ export default function Toolbar({
   onCollapseAll,
   onShowHistory,
   hasFileHandle,
+  moscowFilter,
+  onMoscowFilterChange,
 }: ToolbarProps) {
   return (
     <div className="toolbar">
@@ -41,6 +48,21 @@ export default function Toolbar({
           <>
             <button className="btn" onClick={onSave}>Save</button>
             <button className="btn" onClick={onShowHistory}>History</button>
+            <div className="toolbar-divider" />
+            <select
+              className="btn moscow-filter"
+              value={moscowFilter}
+              onChange={(e) => onMoscowFilterChange(e.target.value as MoscowPriority | 'all')}
+              style={{
+                borderLeftWidth: 3,
+                borderLeftColor: moscowFilter === 'all' ? '#3a3a4e' : MOSCOW_COLORS[moscowFilter],
+              }}
+            >
+              <option value="all">All priorities</option>
+              {(Object.keys(MOSCOW_LABELS) as MoscowPriority[]).map(key => (
+                <option key={key} value={key}>{MOSCOW_LABELS[key]}</option>
+              ))}
+            </select>
             <div className="toolbar-divider" />
             <button className="btn" onClick={onFitView}>Fit View</button>
             <button className="btn" onClick={onExpandAll}>Expand All</button>

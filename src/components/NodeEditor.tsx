@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import type { TreeNodeData, NodeLevel } from '../types';
-import { LEVEL_COLORS, LEVEL_LABELS, CHILD_LEVEL } from '../utils/treeUtils';
+import type { TreeNodeData, NodeLevel, MoscowPriority } from '../types';
+import { LEVEL_COLORS, LEVEL_LABELS, CHILD_LEVEL, MOSCOW_LABELS, MOSCOW_COLORS } from '../utils/treeUtils';
 
 interface NodeEditorProps {
   node: TreeNodeData;
   onUpdateText: (id: string, text: string) => void;
   onUpdateNotes: (id: string, notes: string) => void;
   onUpdateStatus: (id: string, status: 'planned' | 'in-progress' | 'done') => void;
+  onUpdateMoscow: (id: string, moscow: MoscowPriority) => void;
   onAddChild: (parentId: string, parentLevel: NodeLevel) => void;
   onDelete: (id: string) => void;
   onClose: () => void;
@@ -17,6 +18,7 @@ export default function NodeEditor({
   onUpdateText,
   onUpdateNotes,
   onUpdateStatus,
+  onUpdateMoscow,
   onAddChild,
   onDelete,
   onClose,
@@ -68,19 +70,36 @@ export default function NodeEditor({
       </label>
 
       {node.level === 'deliverable' && (
-        <label>
-          Status
-          <select
-            value={node.status || 'planned'}
-            onChange={(e) =>
-              onUpdateStatus(node.id, e.target.value as 'planned' | 'in-progress' | 'done')
-            }
-          >
-            <option value="planned">Planned</option>
-            <option value="in-progress">In Progress</option>
-            <option value="done">Done</option>
-          </select>
-        </label>
+        <>
+          <label>
+            Status
+            <select
+              value={node.status || 'planned'}
+              onChange={(e) =>
+                onUpdateStatus(node.id, e.target.value as 'planned' | 'in-progress' | 'done')
+              }
+            >
+              <option value="planned">Planned</option>
+              <option value="in-progress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+          </label>
+
+          <label>
+            Priority (MoSCoW)
+            <select
+              value={node.moscow || 'unknown'}
+              onChange={(e) =>
+                onUpdateMoscow(node.id, e.target.value as MoscowPriority)
+              }
+              style={{ borderLeftWidth: 3, borderLeftColor: MOSCOW_COLORS[node.moscow || 'unknown'] }}
+            >
+              {(Object.keys(MOSCOW_LABELS) as MoscowPriority[]).map(key => (
+                <option key={key} value={key}>{MOSCOW_LABELS[key]}</option>
+              ))}
+            </select>
+          </label>
+        </>
       )}
 
       <div className="node-editor-actions">

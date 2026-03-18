@@ -1,4 +1,4 @@
-import type { ImpactMap, Actor, Impact, Deliverable, NodeLevel } from '../types';
+import type { ImpactMap, Actor, Impact, Deliverable, NodeLevel, MoscowPriority } from '../types';
 import { generateId } from './idGenerator';
 
 type DeepMutable<T> = { -readonly [P in keyof T]: DeepMutable<T[P]> };
@@ -53,6 +53,22 @@ export function updateDeliverableStatus(
     for (const impact of actor.impacts) {
       for (const del of impact.deliverables) {
         if (del.id === nodeId) { del.status = status; return m; }
+      }
+    }
+  }
+  return m;
+}
+
+export function updateDeliverableMoscow(
+  map: ImpactMap,
+  nodeId: string,
+  moscow: MoscowPriority
+): ImpactMap {
+  const m = cloneMap(map);
+  for (const actor of m.goal.actors) {
+    for (const impact of actor.impacts) {
+      for (const del of impact.deliverables) {
+        if (del.id === nodeId) { del.moscow = moscow; return m; }
       }
     }
   }
@@ -121,6 +137,7 @@ export function addChild(map: ImpactMap, parentId: string, parentLevel: NodeLeve
           text: 'New deliverable',
           notes: '',
           status: 'planned',
+          moscow: 'unknown',
         };
         impact.deliverables.push(newDel);
         return m;

@@ -1,6 +1,7 @@
 import type { HierarchyPointNode } from 'd3-hierarchy';
 import type { TreeNodeData, NodeLevel } from '../types';
-import { LEVEL_COLORS } from '../utils/treeUtils';
+import { LEVEL_COLORS, MOSCOW_COLORS, MOSCOW_LABELS } from '../utils/treeUtils';
+import type { MoscowPriority } from '../types';
 
 const NODE_WIDTH = 160;
 const NODE_HEIGHT = 48;
@@ -13,6 +14,7 @@ const STATUS_ICONS: Record<string, string> = {
 interface TreeNodeProps {
   node: HierarchyPointNode<TreeNodeData>;
   isSelected: boolean;
+  isDimmed: boolean;
   onSelect: (node: HierarchyPointNode<TreeNodeData>) => void;
   onToggleCollapse: (nodeId: string) => void;
 }
@@ -21,16 +23,19 @@ function hasChildren(level: NodeLevel): boolean {
   return level !== 'deliverable';
 }
 
-export default function TreeNode({ node, isSelected, onSelect, onToggleCollapse }: TreeNodeProps) {
+export default function TreeNode({ node, isSelected, isDimmed, onSelect, onToggleCollapse }: TreeNodeProps) {
   const { data } = node;
   const color = LEVEL_COLORS[data.level];
   const halfW = NODE_WIDTH / 2;
   const halfH = NODE_HEIGHT / 2;
+  const moscow = data.moscow as MoscowPriority | undefined;
+  const moscowColor = moscow ? MOSCOW_COLORS[moscow] : undefined;
 
   return (
     <g
       transform={`translate(${node.y},${node.x})`}
       style={{ cursor: 'pointer' }}
+      opacity={isDimmed ? 0.25 : 1}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(node);
@@ -58,6 +63,33 @@ export default function TreeNode({ node, isSelected, onSelect, onToggleCollapse 
         {data.status ? `${STATUS_ICONS[data.status] || ''} ` : ''}
         {data.text.length > 18 ? data.text.slice(0, 16) + '…' : data.text}
       </text>
+
+      {/* MoSCoW priority badge */}
+      {moscow && moscow !== 'unknown' && (
+        <g>
+          <rect
+            x={-halfW + 4}
+            y={halfH - 6}
+            width={36}
+            height={14}
+            rx={4}
+            fill={moscowColor}
+            opacity={0.9}
+          />
+          <text
+            x={-halfW + 22}
+            y={halfH + 1}
+            textAnchor="middle"
+            dy="0.35em"
+            fill="#fff"
+            fontSize={8}
+            fontWeight={700}
+            style={{ pointerEvents: 'none', userSelect: 'none', textTransform: 'uppercase' }}
+          >
+            {MOSCOW_LABELS[moscow]}
+          </text>
+        </g>
+      )}
 
       {/* Collapse/expand toggle */}
       {hasChildren(data.level) && (

@@ -1,12 +1,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { HierarchyPointNode } from 'd3-hierarchy';
-import type { ImpactMap, TreeNodeData, NodeLevel } from './types';
+import type { ImpactMap, TreeNodeData, NodeLevel, MoscowPriority } from './types';
 import { useFileSync } from './hooks/useFileSync';
 import { useLock } from './hooks/useLock';
 import {
   updateNodeText,
   updateNodeNotes,
   updateDeliverableStatus,
+  updateDeliverableMoscow,
   toggleCollapsed,
   setAllCollapsed,
   addChild,
@@ -35,6 +36,7 @@ export default function App() {
 
   const [selectedNode, setSelectedNode] = useState<TreeNodeData | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [moscowFilter, setMoscowFilter] = useState<MoscowPriority | 'all'>('all');
   const saveTimerRef = useRef<number | null>(null);
 
   const scheduleAutoSave = useCallback(
@@ -100,6 +102,14 @@ export default function App() {
     [applyUpdate]
   );
 
+  const handleUpdateMoscow = useCallback(
+    (id: string, moscow: MoscowPriority) => {
+      applyUpdate(map => updateDeliverableMoscow(map, id, moscow));
+      setSelectedNode(prev => (prev && prev.id === id ? { ...prev, moscow } : prev));
+    },
+    [applyUpdate]
+  );
+
   const handleAddChild = useCallback(
     (parentId: string, parentLevel: NodeLevel) => {
       applyUpdate(map => addChild(map, parentId, parentLevel));
@@ -150,7 +160,7 @@ export default function App() {
         for (const impact of actor.impacts) {
           if (impact.id === id) return { id: impact.id, text: impact.text, notes: impact.notes, level: 'impact', collapsed: impact.collapsed, parentId: actor.id };
           for (const del of impact.deliverables) {
-            if (del.id === id) return { id: del.id, text: del.text, notes: del.notes, level: 'deliverable', status: del.status, parentId: impact.id };
+            if (del.id === id) return { id: del.id, text: del.text, notes: del.notes, level: 'deliverable', status: del.status, moscow: del.moscow || 'unknown', parentId: impact.id };
           }
         }
       }
@@ -175,6 +185,8 @@ export default function App() {
         onCollapseAll={handleCollapseAll}
         onShowHistory={() => setShowHistory(true)}
         hasFileHandle={hasFileHandle}
+        moscowFilter={moscowFilter}
+        onMoscowFilterChange={setMoscowFilter}
       />
 
       <LockIndicator lockHolder={lockHolder} isLocked={isLocked} />
@@ -191,6 +203,7 @@ export default function App() {
           <ImpactMapCanvas
             data={data}
             selectedNodeId={selectedNode?.id ?? null}
+            moscowFilter={moscowFilter}
             onSelectNode={handleSelectNode}
             onToggleCollapse={handleToggleCollapse}
           />
@@ -215,6 +228,7 @@ export default function App() {
             onUpdateText={handleUpdateText}
             onUpdateNotes={handleUpdateNotes}
             onUpdateStatus={handleUpdateStatus}
+            onUpdateMoscow={handleUpdateMoscow}
             onAddChild={handleAddChild}
             onDelete={handleDelete}
             onClose={() => setSelectedNode(null)}

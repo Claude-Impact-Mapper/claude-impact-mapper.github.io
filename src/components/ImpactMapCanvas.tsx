@@ -4,7 +4,7 @@ import { zoom, zoomIdentity } from 'd3-zoom';
 import { select } from 'd3-selection';
 import 'd3-transition';
 import type { HierarchyPointNode } from 'd3-hierarchy';
-import type { ImpactMap, TreeNodeData } from '../types';
+import type { ImpactMap, TreeNodeData, MoscowPriority } from '../types';
 import { mapToHierarchy, type TreeNodeWithChildren } from '../utils/treeUtils';
 import TreeNode from './TreeNode';
 import TreeLink from './TreeLink';
@@ -12,6 +12,7 @@ import TreeLink from './TreeLink';
 interface ImpactMapCanvasProps {
   data: ImpactMap;
   selectedNodeId: string | null;
+  moscowFilter: MoscowPriority | 'all';
   onSelectNode: (node: HierarchyPointNode<TreeNodeData>) => void;
   onToggleCollapse: (nodeId: string) => void;
 }
@@ -19,9 +20,17 @@ interface ImpactMapCanvasProps {
 const NODE_SEP_X = 220;
 const NODE_SEP_Y = 70;
 
+function shouldDim(node: TreeNodeData, filter: MoscowPriority | 'all'): boolean {
+  if (filter === 'all') return false;
+  if (node.level !== 'deliverable') return false;
+  const moscow = node.moscow || 'unknown';
+  return moscow !== filter;
+}
+
 export default function ImpactMapCanvas({
   data,
   selectedNodeId,
+  moscowFilter,
   onSelectNode,
   onToggleCollapse,
 }: ImpactMapCanvasProps) {
@@ -128,6 +137,7 @@ export default function ImpactMapCanvas({
             key={node.data.id}
             node={node as HierarchyPointNode<TreeNodeData>}
             isSelected={node.data.id === selectedNodeId}
+            isDimmed={shouldDim(node.data, moscowFilter)}
             onSelect={n => onSelectNode(n)}
             onToggleCollapse={onToggleCollapse}
           />
