@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "title": "My Impact Map",
+  "goal": {
+    "id": "goal-1",
+    "text": "Increase MAU by 20%",
+    "notes": "",
+    "collapsed": false,
+    "actors": [
+      {
+        "id": "actor-1",
+        "text": "New users",
+        "notes": "",
+        "collapsed": false,
+        "impacts": [
+          {
+            "id": "impact-1",
+            "text": "Sign up faster",
+            "notes": "",
+            "collapsed": false,
+            "deliverables": [
+              {
+                "id": "del-1",
+                "text": "Social login",
+                "notes": "",
+                "status": "planned"
+              }
+            ]
+          },
+          {
+            "id": "impact-2",
+            "text": "Discover features easily",
+            "notes": "",
+            "collapsed": false,
+            "deliverables": [
+              {
+                "id": "del-2",
+                "text": "Onboarding tour",
+                "notes": "",
+                "status": "planned"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "actor-2",
+        "text": "Existing users",
+        "notes": "",
+        "collapsed": false,
+        "impacts": [
+          {
+            "id": "impact-3",
+            "text": "Return more often",
+            "notes": "",
+            "collapsed": false,
+            "deliverables": [
+              {
+                "id": "del-3",
+                "text": "Email digest",
+                "notes": "",
+                "status": "in-progress"
+              },
+              {
+                "id": "del-4",
+                "text": "Push notifications",
+                "notes": "",
+                "status": "planned"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
