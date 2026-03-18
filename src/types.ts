@@ -29,10 +29,18 @@ export interface Goal {
   actors: Actor[];
 }
 
+export interface HistoryEntry {
+  timestamp: string;
+  author: string;
+  summary: string;
+}
+
 export interface ImpactMap {
   version: number;
   title: string;
   goal: Goal;
+  lastModified?: string;
+  history?: HistoryEntry[];
 }
 
 export type NodeLevel = 'goal' | 'actor' | 'impact' | 'deliverable';

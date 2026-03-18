@@ -7,6 +7,7 @@ interface ToolbarProps {
   onFitView: () => void;
   onExpandAll: () => void;
   onCollapseAll: () => void;
+  onShowHistory: () => void;
   hasFileHandle: boolean;
 }
 
@@ -19,6 +20,7 @@ export default function Toolbar({
   onFitView,
   onExpandAll,
   onCollapseAll,
+  onShowHistory,
   hasFileHandle,
 }: ToolbarProps) {
   return (
@@ -38,6 +40,7 @@ export default function Toolbar({
         {hasFileHandle && (
           <>
             <button className="btn" onClick={onSave}>Save</button>
+            <button className="btn" onClick={onShowHistory}>History</button>
             <div className="toolbar-divider" />
             <button className="btn" onClick={onFitView}>Fit View</button>
             <button className="btn" onClick={onExpandAll}>Expand All</button>

@@ -17,6 +17,7 @@ import ImpactMapCanvas from './components/ImpactMapCanvas';
 import NodeEditor from './components/NodeEditor';
 import Toolbar from './components/Toolbar';
 import LockIndicator from './components/LockIndicator';
+import GitHistory from './components/GitHistory';
 import './App.css';
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
   const { lockHolder, isLocked } = useLock();
 
   const [selectedNode, setSelectedNode] = useState<TreeNodeData | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
   const saveTimerRef = useRef<number | null>(null);
 
   const scheduleAutoSave = useCallback(
@@ -171,10 +173,18 @@ export default function App() {
         onFitView={handleFitView}
         onExpandAll={handleExpandAll}
         onCollapseAll={handleCollapseAll}
+        onShowHistory={() => setShowHistory(true)}
         hasFileHandle={hasFileHandle}
       />
 
       <LockIndicator lockHolder={lockHolder} isLocked={isLocked} />
+
+      <GitHistory
+        isOpen={showHistory}
+        onClose={() => setShowHistory(false)}
+        history={data?.history || []}
+        lastModified={data?.lastModified}
+      />
 
       <div className="main-content">
         {data ? (

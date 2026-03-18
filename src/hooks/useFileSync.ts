@@ -48,18 +48,31 @@ export function useFileSync() {
     }
   }, [readFile]);
 
-  const saveFile = useCallback(async (mapData: ImpactMap) => {
+  const saveFile = useCallback(async (mapData: ImpactMap, summary?: string) => {
     const handle = fileHandleRef.current;
     if (!handle) return;
 
     try {
-      const content = JSON.stringify(mapData, null, 2);
+      const now = new Date().toISOString();
+      const dataToSave = {
+        ...mapData,
+        lastModified: now,
+        history: [
+          {
+            timestamp: now,
+            author: 'browser',
+            summary: summary || 'Updated via browser',
+          },
+          ...(mapData.history || []).slice(0, 49),
+        ],
+      };
+      const content = JSON.stringify(dataToSave, null, 2);
       justWroteRef.current = true;
       const writable = await handle.createWritable();
       await writable.write(content);
       await writable.close();
       lastHashRef.current = await hashContent(content);
-      setData(mapData);
+      setData(dataToSave);
       setIsSynced(true);
     } catch (err) {
       console.error('Failed to save file:', err);
