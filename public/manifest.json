@@ -1,0 +1,16 @@
+{
+  "name": "Claude Impact Mapper",
+  "short_name": "ClaudeImpactMap",
+  "description": "AI-paired Impact Mapping tool",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#1a1a2e",
+  "background_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
