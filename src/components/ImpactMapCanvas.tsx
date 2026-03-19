@@ -17,8 +17,8 @@ interface ImpactMapCanvasProps {
   onToggleCollapse: (nodeId: string) => void;
 }
 
-const NODE_SEP_X = 260;
-const NODE_SEP_Y = 85;
+const NODE_SEP_X = 320;
+const NODE_SEP_Y = 100;
 
 function shouldDim(node: TreeNodeData, filter: MoscowPriority | 'all'): boolean {
   if (filter === 'all') return false;

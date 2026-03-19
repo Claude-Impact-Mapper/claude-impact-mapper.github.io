@@ -3,8 +3,8 @@ import type { TreeNodeData, NodeLevel } from '../types';
 import { LEVEL_COLORS, MOSCOW_COLORS, MOSCOW_LABELS } from '../utils/treeUtils';
 import type { MoscowPriority } from '../types';
 
-const NODE_WIDTH = 200;
-const NODE_HEIGHT = 64;
+const NODE_WIDTH = 260;
+const NODE_HEIGHT = 80;
 const STATUS_ICONS: Record<string, string> = {
   planned: '○',
   'in-progress': '◐',
@@ -53,17 +53,27 @@ export default function TreeNode({ node, isSelected, isDimmed, onSelect, onToggl
         stroke={color}
         strokeWidth={isSelected ? 3 : 2}
       />
-      <text
-        textAnchor="middle"
-        dy="0.35em"
-        fill={isSelected ? '#fff' : '#e0e0e0'}
-        fontSize={11}
-        fontWeight={500}
-        style={{ pointerEvents: 'none', userSelect: 'none' }}
-      >
-        {data.status ? `${STATUS_ICONS[data.status] || ''} ` : ''}
-        {data.text.length > 24 ? data.text.slice(0, 22) + '…' : data.text}
-      </text>
+      {(() => {
+        const prefix = data.status ? `${STATUS_ICONS[data.status] || ''} ` : '';
+        const full = prefix + data.text;
+        const maxChars = 32;
+        const line1 = full.slice(0, maxChars);
+        const line2 = full.length > maxChars ? full.slice(maxChars, maxChars * 2) : '';
+        const line2Text = full.length > maxChars * 2 ? line2.slice(0, maxChars - 1) + '…' : line2;
+        return (
+          <text
+            x={-halfW + 12}
+            textAnchor="start"
+            fill={isSelected ? '#fff' : '#e0e0e0'}
+            fontSize={10}
+            fontWeight={500}
+            style={{ pointerEvents: 'none', userSelect: 'none' }}
+          >
+            <tspan x={-halfW + 12} dy={line2 ? '-0.4em' : '0.35em'}>{line1}</tspan>
+            {line2Text && <tspan x={-halfW + 12} dy="1.3em">{line2Text}</tspan>}
+          </text>
+        );
+      })()}
 
       {/* MoSCoW priority badge */}
       {moscow && moscow !== 'unknown' && (
