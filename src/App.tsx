@@ -40,6 +40,23 @@ export default function App() {
   const [showHistory, setShowHistory] = useState(false);
   const [moscowFilter, setMoscowFilter] = useState<MoscowPriority | 'all'>('all');
   const saveTimerRef = useRef<number | null>(null);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e as BeforeInstallPromptEvent);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = useCallback(async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    setInstallPrompt(null);
+  }, [installPrompt]);
 
   const scheduleAutoSave = useCallback(
     (newData: ImpactMap) => {
@@ -209,6 +226,8 @@ export default function App() {
         hasFileHandle={hasFileHandle}
         moscowFilter={moscowFilter}
         onMoscowFilterChange={setMoscowFilter}
+        canInstall={!!installPrompt}
+        onInstall={handleInstall}
       />
 
       <LockIndicator lockHolder={lockHolder} isLocked={isLocked} />
@@ -241,6 +260,14 @@ export default function App() {
                 New Map
               </button>
             </div>
+            {installPrompt && (
+              <button className="btn btn-install" onClick={handleInstall}>
+                Install for offline use
+              </button>
+            )}
+            <p className="empty-state-hint">
+              Tip: You can install this app for offline use from your browser menu or the toolbar.
+            </p>
           </div>
         )}
 

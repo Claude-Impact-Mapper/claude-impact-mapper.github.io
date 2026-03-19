@@ -16,6 +16,8 @@ interface ToolbarProps {
   hasFileHandle: boolean;
   moscowFilter: MoscowPriority | 'all';
   onMoscowFilterChange: (filter: MoscowPriority | 'all') => void;
+  canInstall: boolean;
+  onInstall: () => void;
 }
 
 export default function Toolbar({
@@ -33,6 +35,8 @@ export default function Toolbar({
   hasFileHandle,
   moscowFilter,
   onMoscowFilterChange,
+  canInstall,
+  onInstall,
 }: ToolbarProps) {
   return (
     <div className="toolbar">
@@ -46,6 +50,9 @@ export default function Toolbar({
         )}
       </div>
       <div className="toolbar-right">
+        {canInstall && (
+          <button className="btn btn-install" onClick={onInstall}>Install App</button>
+        )}
         <button className="btn" onClick={onOpenFile}>Open File</button>
         <button className="btn" onClick={onNewMap}>New Map</button>
         {hasFileHandle && (
