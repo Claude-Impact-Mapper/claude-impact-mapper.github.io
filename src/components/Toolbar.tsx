@@ -11,6 +11,8 @@ interface ToolbarProps {
   onExpandAll: () => void;
   onCollapseAll: () => void;
   onShowHistory: () => void;
+  onExportCsv: () => void;
+  onExportExcel: () => void;
   hasFileHandle: boolean;
   moscowFilter: MoscowPriority | 'all';
   onMoscowFilterChange: (filter: MoscowPriority | 'all') => void;
@@ -26,6 +28,8 @@ export default function Toolbar({
   onExpandAll,
   onCollapseAll,
   onShowHistory,
+  onExportCsv,
+  onExportExcel,
   hasFileHandle,
   moscowFilter,
   onMoscowFilterChange,
@@ -48,6 +52,8 @@ export default function Toolbar({
           <>
             <button className="btn" onClick={onSave}>Save</button>
             <button className="btn" onClick={onShowHistory}>History</button>
+            <button className="btn" onClick={onExportCsv}>Export CSV</button>
+            <button className="btn" onClick={onExportExcel}>Export Excel</button>
             <div className="toolbar-divider" />
             <select
               className="btn moscow-filter"

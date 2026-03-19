@@ -9,6 +9,7 @@ const STATUS_ICONS: Record<string, string> = {
   planned: '○',
   'in-progress': '◐',
   done: '●',
+  unplanned: '✕',
 };
 
 interface TreeNodeProps {

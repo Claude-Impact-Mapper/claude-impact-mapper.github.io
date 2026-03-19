@@ -6,7 +6,7 @@ interface NodeEditorProps {
   node: TreeNodeData;
   onUpdateText: (id: string, text: string) => void;
   onUpdateNotes: (id: string, notes: string) => void;
-  onUpdateStatus: (id: string, status: 'planned' | 'in-progress' | 'done') => void;
+  onUpdateStatus: (id: string, status: 'planned' | 'in-progress' | 'done' | 'unplanned') => void;
   onUpdateMoscow: (id: string, moscow: MoscowPriority) => void;
   onAddChild: (parentId: string, parentLevel: NodeLevel) => void;
   onDelete: (id: string) => void;
@@ -76,12 +76,13 @@ export default function NodeEditor({
             <select
               value={node.status || 'planned'}
               onChange={(e) =>
-                onUpdateStatus(node.id, e.target.value as 'planned' | 'in-progress' | 'done')
+                onUpdateStatus(node.id, e.target.value as 'planned' | 'in-progress' | 'done' | 'unplanned')
               }
             >
               <option value="planned">Planned</option>
               <option value="in-progress">In Progress</option>
               <option value="done">Done</option>
+              <option value="unplanned">Unplanned</option>
             </select>
           </label>
 

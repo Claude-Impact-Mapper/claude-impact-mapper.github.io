@@ -111,12 +111,29 @@ export default function ImpactMapCanvas({
     }
   });
 
-  // Auto-fit when data changes (new file opened, external edit)
+  // Structural fingerprint — changes only when nodes are added/removed or collapsed/expanded
+  const structureKey = useMemo(() => {
+    if (!data) return '';
+    const parts: string[] = [];
+    parts.push(`${data.goal.id}:${data.goal.collapsed}`);
+    for (const a of data.goal.actors) {
+      parts.push(`${a.id}:${a.collapsed}`);
+      for (const i of a.impacts) {
+        parts.push(`${i.id}:${i.collapsed}`);
+        for (const d of i.deliverables) {
+          parts.push(d.id);
+        }
+      }
+    }
+    return parts.join(',');
+  }, [data]);
+
+  // Auto-fit when structure changes (new file, node added/removed, expand/collapse)
   useEffect(() => {
-    // Small delay so layout has rendered
+    if (!structureKey) return;
     const t = setTimeout(fitView, 100);
     return () => clearTimeout(t);
-  }, [data]);
+  }, [structureKey]);
 
   return (
     <svg

@@ -4,7 +4,7 @@ export interface Deliverable {
   id: string;
   text: string;
   notes: string;
-  status: 'planned' | 'in-progress' | 'done';
+  status: 'planned' | 'in-progress' | 'done' | 'unplanned';
   moscow: MoscowPriority;
 }
 

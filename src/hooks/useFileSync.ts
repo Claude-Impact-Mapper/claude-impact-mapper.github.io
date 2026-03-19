@@ -145,5 +145,6 @@ export function useFileSync() {
     saveFile,
     createNewFile,
     hasFileHandle: !!fileHandleRef.current,
+    fileHandle: fileHandleRef.current,
   };
 }

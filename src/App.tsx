@@ -14,6 +14,7 @@ import {
   deleteNode,
   createEmptyMap,
 } from './utils/mapOperations';
+import { exportCsv, exportExcel } from './utils/exportMap';
 import ImpactMapCanvas from './components/ImpactMapCanvas';
 import NodeEditor from './components/NodeEditor';
 import Toolbar from './components/Toolbar';
@@ -31,6 +32,7 @@ export default function App() {
     saveFile,
     createNewFile,
     hasFileHandle,
+    fileHandle,
   } = useFileSync();
   const { lockHolder, isLocked } = useLock();
 
@@ -95,7 +97,7 @@ export default function App() {
   );
 
   const handleUpdateStatus = useCallback(
-    (id: string, status: 'planned' | 'in-progress' | 'done') => {
+    (id: string, status: 'planned' | 'in-progress' | 'done' | 'unplanned') => {
       applyUpdate(map => updateDeliverableStatus(map, id, status));
       setSelectedNode(prev => (prev && prev.id === id ? { ...prev, status } : prev));
     },
@@ -105,7 +107,11 @@ export default function App() {
   const handleUpdateMoscow = useCallback(
     (id: string, moscow: MoscowPriority) => {
       applyUpdate(map => updateDeliverableMoscow(map, id, moscow));
-      setSelectedNode(prev => (prev && prev.id === id ? { ...prev, moscow } : prev));
+      setSelectedNode(prev => {
+        if (!prev || prev.id !== id) return prev;
+        const newStatus = moscow === 'wont' ? 'unplanned' : (prev.status === 'unplanned' ? 'planned' : prev.status);
+        return { ...prev, moscow, status: newStatus };
+      });
     },
     [applyUpdate]
   );
@@ -148,6 +154,20 @@ export default function App() {
     applyUpdate(map => setAllCollapsed(map, true));
   }, [applyUpdate]);
 
+  const handleExportCsv = useCallback(async () => {
+    if (!data) return;
+    try { await exportCsv(data, fileHandle); } catch (err) {
+      if ((err as Error).name !== 'AbortError') console.error('Export failed:', err);
+    }
+  }, [data, fileHandle]);
+
+  const handleExportExcel = useCallback(async () => {
+    if (!data) return;
+    try { await exportExcel(data, fileHandle); } catch (err) {
+      if ((err as Error).name !== 'AbortError') console.error('Export failed:', err);
+    }
+  }, [data, fileHandle]);
+
   // Update selectedNode when data changes externally
   useEffect(() => {
     if (!selectedNode || !data) return;
@@ -184,6 +204,8 @@ export default function App() {
         onExpandAll={handleExpandAll}
         onCollapseAll={handleCollapseAll}
         onShowHistory={() => setShowHistory(true)}
+        onExportCsv={handleExportCsv}
+        onExportExcel={handleExportExcel}
         hasFileHandle={hasFileHandle}
         moscowFilter={moscowFilter}
         onMoscowFilterChange={setMoscowFilter}

@@ -46,7 +46,7 @@ export function updateNodeNotes(map: ImpactMap, nodeId: string, notes: string): 
 export function updateDeliverableStatus(
   map: ImpactMap,
   nodeId: string,
-  status: 'planned' | 'in-progress' | 'done'
+  status: 'planned' | 'in-progress' | 'done' | 'unplanned'
 ): ImpactMap {
   const m = cloneMap(map);
   for (const actor of m.goal.actors) {
@@ -68,7 +68,12 @@ export function updateDeliverableMoscow(
   for (const actor of m.goal.actors) {
     for (const impact of actor.impacts) {
       for (const del of impact.deliverables) {
-        if (del.id === nodeId) { del.moscow = moscow; return m; }
+        if (del.id === nodeId) {
+          del.moscow = moscow;
+          if (moscow === 'wont') del.status = 'unplanned';
+          else if (del.status === 'unplanned') del.status = 'planned';
+          return m;
+        }
       }
     }
   }
