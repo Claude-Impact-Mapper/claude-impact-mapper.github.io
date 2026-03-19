@@ -103,6 +103,32 @@ export default function ImpactMapCanvas({
       .call(zoomRef.current.transform, zoomIdentity.translate(tx, ty).scale(scale));
   };
 
+  // Center content without changing zoom scale
+  const centerView = () => {
+    const svg = svgRef.current;
+    if (!svg || !zoomRef.current || nodes.length === 0) return;
+
+    const svgRect = svg.getBoundingClientRect();
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const n of nodes) {
+      if (n.x < minX) minX = n.x;
+      if (n.x > maxX) maxX = n.x;
+      if (n.y < minY) minY = n.y;
+      if (n.y > maxY) maxY = n.y;
+    }
+
+    // Read current scale from the existing transform
+    const currentTransform = select(svg).property('__zoom') ?? zoomIdentity;
+    const scale = currentTransform.k;
+    const tx = svgRect.width / 2 - ((minY + maxY) / 2) * scale;
+    const ty = svgRect.height / 2 - ((minX + maxX) / 2) * scale;
+
+    select(svg)
+      .transition()
+      .duration(300)
+      .call(zoomRef.current.transform, zoomIdentity.translate(tx, ty).scale(scale));
+  };
+
   // Expose fitView on the SVG element so the toolbar can call it
   useEffect(() => {
     const svg = svgRef.current;
@@ -111,7 +137,7 @@ export default function ImpactMapCanvas({
     }
   });
 
-  // Structural fingerprint — changes only when nodes are added/removed or a new file is opened
+  // Node identity fingerprint — changes when nodes are added/removed or new file opened
   const structureKey = useMemo(() => {
     if (!data) return '';
     const ids: string[] = [];
@@ -128,12 +154,43 @@ export default function ImpactMapCanvas({
     return ids.join(',');
   }, [data]);
 
-  // Auto-fit when structure changes (new file, node added/removed)
+  // Layout fingerprint — includes collapse state (triggers re-center, not full fit)
+  const layoutKey = useMemo(() => {
+    if (!data) return '';
+    const parts: string[] = [];
+    parts.push(`${data.goal.id}:${data.goal.collapsed}`);
+    for (const a of data.goal.actors) {
+      parts.push(`${a.id}:${a.collapsed}`);
+      for (const i of a.impacts) {
+        parts.push(`${i.id}:${i.collapsed}`);
+        for (const d of i.deliverables) {
+          parts.push(d.id);
+        }
+      }
+    }
+    return parts.join(',');
+  }, [data]);
+
+  // Auto-fit when nodes are added/removed or new file opened
   useEffect(() => {
     if (!structureKey) return;
     const t = setTimeout(fitView, 100);
     return () => clearTimeout(t);
   }, [structureKey]);
+
+  // Re-center (keep zoom) when collapse state changes
+  const prevLayoutKeyRef = useRef(layoutKey);
+  useEffect(() => {
+    if (!layoutKey || layoutKey === prevLayoutKeyRef.current) return;
+    // Only center if the node IDs haven't changed (structureKey handles that with fitView)
+    const prevIds = prevLayoutKeyRef.current.replace(/:[^,]*/g, '');
+    const currIds = layoutKey.replace(/:[^,]*/g, '');
+    prevLayoutKeyRef.current = layoutKey;
+    if (prevIds === currIds) {
+      const t = setTimeout(centerView, 100);
+      return () => clearTimeout(t);
+    }
+  }, [layoutKey]);
 
   return (
     <svg
