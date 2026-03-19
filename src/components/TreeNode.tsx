@@ -3,8 +3,8 @@ import type { TreeNodeData, NodeLevel } from '../types';
 import { LEVEL_COLORS, MOSCOW_COLORS, MOSCOW_LABELS } from '../utils/treeUtils';
 import type { MoscowPriority } from '../types';
 
-const NODE_WIDTH = 160;
-const NODE_HEIGHT = 48;
+const NODE_WIDTH = 200;
+const NODE_HEIGHT = 64;
 const STATUS_ICONS: Record<string, string> = {
   planned: '○',
   'in-progress': '◐',
@@ -57,12 +57,12 @@ export default function TreeNode({ node, isSelected, isDimmed, onSelect, onToggl
         textAnchor="middle"
         dy="0.35em"
         fill={isSelected ? '#fff' : '#e0e0e0'}
-        fontSize={13}
+        fontSize={11}
         fontWeight={500}
         style={{ pointerEvents: 'none', userSelect: 'none' }}
       >
         {data.status ? `${STATUS_ICONS[data.status] || ''} ` : ''}
-        {data.text.length > 18 ? data.text.slice(0, 16) + '…' : data.text}
+        {data.text.length > 24 ? data.text.slice(0, 22) + '…' : data.text}
       </text>
 
       {/* MoSCoW priority badge */}
@@ -83,7 +83,7 @@ export default function TreeNode({ node, isSelected, isDimmed, onSelect, onToggl
             textAnchor="middle"
             dy="0.35em"
             fill="#fff"
-            fontSize={8}
+            fontSize={7}
             fontWeight={700}
             style={{ pointerEvents: 'none', userSelect: 'none', textTransform: 'uppercase' }}
           >

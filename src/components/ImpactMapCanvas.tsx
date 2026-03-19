@@ -17,8 +17,8 @@ interface ImpactMapCanvasProps {
   onToggleCollapse: (nodeId: string) => void;
 }
 
-const NODE_SEP_X = 220;
-const NODE_SEP_Y = 70;
+const NODE_SEP_X = 260;
+const NODE_SEP_Y = 85;
 
 function shouldDim(node: TreeNodeData, filter: MoscowPriority | 'all'): boolean {
   if (filter === 'all') return false;
@@ -111,24 +111,24 @@ export default function ImpactMapCanvas({
     }
   });
 
-  // Structural fingerprint — changes only when nodes are added/removed or collapsed/expanded
+  // Structural fingerprint — changes only when nodes are added/removed or a new file is opened
   const structureKey = useMemo(() => {
     if (!data) return '';
-    const parts: string[] = [];
-    parts.push(`${data.goal.id}:${data.goal.collapsed}`);
+    const ids: string[] = [];
+    ids.push(data.goal.id);
     for (const a of data.goal.actors) {
-      parts.push(`${a.id}:${a.collapsed}`);
+      ids.push(a.id);
       for (const i of a.impacts) {
-        parts.push(`${i.id}:${i.collapsed}`);
+        ids.push(i.id);
         for (const d of i.deliverables) {
-          parts.push(d.id);
+          ids.push(d.id);
         }
       }
     }
-    return parts.join(',');
+    return ids.join(',');
   }, [data]);
 
-  // Auto-fit when structure changes (new file, node added/removed, expand/collapse)
+  // Auto-fit when structure changes (new file, node added/removed)
   useEffect(() => {
     if (!structureKey) return;
     const t = setTimeout(fitView, 100);
